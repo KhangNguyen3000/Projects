@@ -1,0 +1,177 @@
+import pygame
+import time
+import random
+import os
+
+pygame.init()
+
+clock = pygame.time.Clock()
+
+bX = 10 #largeur du bloc
+bY = 10 #longueur du bloc
+bX2 = 10 #longueur du enemy
+bY2 = 10 #longueur du enemy
+
+
+
+nE = 0 # nombre dennemie au debut
+
+rR = 60 # refreshRate
+
+dW = 800 # longueur du fenetre
+dH = 600 # largeur du fentre
+x = dW/2
+y = dH/2
+
+m = 5 # vitesse du bloc
+eS = 5 #enemy speed
+
+white = (255,255,255)
+black = (0,0,0)
+red = (255,0,0)
+green = (0,255,0)
+
+font = pygame.font.SysFont(None, 25)
+
+
+fps = pygame.time.Clock()
+display = pygame.display.set_mode((dW,dH))
+pygame.display.set_caption("Khang")
+pygame.display.update()
+eSpawn = pygame.USEREVENT + 1
+
+pygame.time.set_timer(eSpawn, 100)
+
+
+
+
+
+
+def Snake(sList, bX, bY):
+    for xY in sList:
+        p = display.fill(black, rect = (xY[0], xY[1], bX, bY))
+    return p
+
+
+def TObj (text, color):
+    tSurf = font.render(text, True, color) #creer le msg
+    return tSurf, tSurf.get_rect() # return le msg et le rectangle du msg (lespace pris)
+
+
+def Msg(msg, color):
+    tSurf, tRect = TObj(msg, color)
+    tRect.center = (dW/2), (dH/2)
+    display.blit(tSurf, tRect) # display l'image
+    pygame.display.update()#update le display
+
+def Game ():
+    ex = False
+    gOver = False
+    
+    x = dW/2
+    y = dH/2
+
+    sList = []
+    sL = 1
+    
+    cx = 0 #vitesse x commene
+    cy = 0 # vitesse y commence
+
+    rX = random.randrange(0,(dW-bX2))
+    rY = random.randrange(0,(dH-bY2))
+
+    p = display.fill(black, rect = (x, y, bX, bY)) # player
+    f = display.fill(red, rect = (rX, rY, bX2, bY2)) # enemy
+
+    while not ex:
+
+        while gOver == True:
+            display.fill(white)
+            Msg("C to play again. Q to quit", red)
+
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_q:
+                        ex = True
+                        gOver = False
+
+                    elif event.key == pygame.K_c:
+                        Game()
+            
+
+        
+        for event in pygame.event.get():
+                
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    if cx == 0:
+                        cx = -m
+                        cy = 0
+                elif event.key == pygame.K_RIGHT:
+                    if cx == 0:
+                        cx = m
+                        cy = 0
+                elif event.key == pygame.K_DOWN:
+                    if cy == 0:
+                        cy = m
+                        cx = 0
+                elif event.key == pygame.K_UP:
+                    if cy == 0:
+                        cy = -m
+                        cx = 0
+                elif event.key == pygame.K_e:
+                    gOver = True
+
+
+        
+        if x <= 0:
+            cx = m
+            cy = 0
+        if y <= 0:
+            cy = m
+            cx = 0
+        if x >= (dW-bX):
+            cy = 0
+            cx = -m
+        if y >= (dH-bY):
+            cy = -m
+            cx = 0
+
+            
+        x += cx
+        y += cy
+        display.fill(white)
+        f = display.fill(green, rect = (rX, rY, bX2, bY2))
+
+
+        s = []
+        s.append(x)
+        s.append(y)
+        sList.append(s)
+
+
+        if len(sList) > sL: # si il touche pas la blocke rouge
+            del sList[0]
+
+        for eB in sList[:-1]: #check si head touche corps
+            if eB == s:
+                gOver = True
+        
+        
+        p = Snake(sList, bX, bY)
+
+
+        if p.colliderect(f) == True:# si il touche la nourriture
+            sL +=1
+            rX = random.randrange(0,(dW-bX))
+            rY = random.randrange(bY,dH)
+
+
+            
+        pygame.display.update()
+        fps.tick(rR)
+
+    pygame.quit()
+    os._exit(1)
+
+Game()

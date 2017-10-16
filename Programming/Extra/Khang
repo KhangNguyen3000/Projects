@@ -1,0 +1,55 @@
+import pygame
+
+
+pygame.display.init()
+x = 400
+y = 300
+cx = 0
+cy = 0
+white = (255,255,255)
+black = (0,0,0)
+fps = pygame.time.Clock()
+
+display = pygame.display.set_mode((800,600))
+pygame.display.set_caption("Khang")
+pygame.display.update()
+exit = False
+
+while not exit:
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                cx = -5
+                cy = 0
+            elif event.key == pygame.K_RIGHT:
+                cx = 5
+                cy = 0
+            elif event.key == pygame.K_DOWN:
+                cy = 5
+                cx = 0
+            elif event.key == pygame.K_UP:
+                cy = -5
+                cx = 0
+            elif event.key == pygame.K_q:
+                exit = true
+
+
+
+    if x < 0:
+        exit = True
+    if y < 0:
+        exit = True
+    if x > 800:
+        exit = True
+    if y > 600:
+        exit = True
+    print(event)
+    x += cx
+    y += cy
+    display.fill(white)
+    display.fill(black, rect = (x, y, 10, 10))
+    pygame.display.update()
+    fps.tick(60)
+
+pygame.quit()
+quit()
